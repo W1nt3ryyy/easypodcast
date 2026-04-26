@@ -1,0 +1,4 @@
+test:
+  image: alpine:latest
+  script:
+    - echo "runner works"

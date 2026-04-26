@@ -1,0 +1,44 @@
+__pycache__/
+*.py[cod]
+*.log
+*.pot
+
+media/
+staticfiles/
+
+.env
+venv/
+.venv/
+env/
+ENV/
+
+build/
+dist/
+*.egg-info/
+.eggs/
+
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+.mypy_cache/
+
+.ipynb_checkpoints/
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+build/
+dist/
+
+# VS Code
+.vscode/
+# JetBrains IDE
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
