@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Minimal Podcast</title>
+    <link>https://example.com/minimal</link>
+    <description>Minimal sample feed.</description>
+    <item>
+      <title>Pilot</title>
+      <guid>pilot</guid>
+      <description>First episode.</description>
+    </item>
+  </channel>
+</rss>

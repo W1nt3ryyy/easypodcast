@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+     xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+     xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Deep Space Radio</title>
+    <link>https://example.com/podcasts/deep-space</link>
+    <description>Stories about space missions.</description>
+    <language>en-us</language>
+    <itunes:author>Easy Podcasts</itunes:author>
+    <itunes:image href="https://example.com/podcasts/deep-space.jpg" />
+    <lastBuildDate>Mon, 01 Jan 2024 10:00:00 GMT</lastBuildDate>
+    <item>
+      <title>Episode 1</title>
+      <description>Launch day.</description>
+      <guid>ep-1</guid>
+      <pubDate>Mon, 01 Jan 2024 09:00:00 GMT</pubDate>
+      <enclosure url="https://cdn.example.com/ep1.mp3" length="12345" type="audio/mpeg" />
+    </item>
+    <item>
+      <title>Episode 2</title>
+      <description>Docking procedure.</description>
+      <guid>ep-2</guid>
+      <pubDate>Tue, 02 Jan 2024 09:00:00 GMT</pubDate>
+      <enclosure url="https://cdn.example.com/ep2.mp3" length="22345" type="audio/mpeg" />
+    </item>
+  </channel>
+</rss>
