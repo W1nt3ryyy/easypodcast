@@ -121,16 +121,6 @@ OPENAPI_SCHEMA = {
                 "responses": {"200": {"description": "Directory items"}},
             }
         },
-        "/api/podcasts/audio/": {
-            "get": {
-                "summary": "Proxy podcast audio through the backend",
-                "parameters": [{"name": "url", "in": "query", "required": True, "schema": {"type": "string", "format": "uri"}}],
-                "responses": {
-                    "200": {"description": "Audio stream"},
-                    "206": {"description": "Partial audio stream"},
-                },
-            }
-        },
         "/api/podcasts/preview/": {
             "post": {
                 "summary": "Preview RSS episodes without subscribing",

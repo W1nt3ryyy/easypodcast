@@ -1,20 +1,17 @@
 import base64
 import hashlib
 import hmac
-import ipaddress
 import json
 import re
-import socket
 import time
 from datetime import timedelta
 from functools import wraps
-from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode, urlparse
+from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
-from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
+from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
@@ -47,48 +44,6 @@ def _json_request(url: str, timeout: int = 12) -> dict:
     request = Request(url, headers={"User-Agent": "EasyPodcasts/1.0"})
     with urlopen(request, timeout=timeout) as response:
         return json.loads(response.read().decode("utf-8"))
-
-
-def _is_public_http_url(url: str) -> bool:
-    parsed = urlparse(url)
-    if parsed.scheme not in {"http", "https"} or not parsed.hostname:
-        return False
-    try:
-        addresses = socket.getaddrinfo(parsed.hostname, None)
-    except socket.gaierror:
-        return False
-    for address in addresses:
-        ip = ipaddress.ip_address(address[4][0])
-        if not ip.is_global:
-            return False
-    return True
-
-
-def _audio_proxy_headers(url: str, request) -> dict:
-    parsed = urlparse(url)
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/124.0 Safari/537.36 EasyPodcasts/1.0",
-        "Accept": "audio/*,*/*;q=0.8",
-        "Accept-Encoding": "identity",
-        "Connection": "close",
-        "Referer": f"{parsed.scheme}://{parsed.netloc}/",
-    }
-    range_header = request.headers.get("Range")
-    if range_header:
-        headers["Range"] = range_header
-    return headers
-
-
-def _response_chunks(response, chunk_size: int = 1024 * 64):
-    try:
-        while True:
-            chunk = response.read(chunk_size)
-            if not chunk:
-                break
-            yield chunk
-    finally:
-        response.close()
 
 
 def _b64encode(value: bytes) -> str:
@@ -552,33 +507,6 @@ def popular_podcasts(request):
         return JsonResponse({"status": "ok", "items": items, "genre": genre_key})
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=502)
-
-
-def proxy_audio(request):
-    url = (request.GET.get("url") or "").strip()
-    if not url:
-        return JsonResponse({"error": "url is required"}, status=400)
-    if not _is_public_http_url(url):
-        return JsonResponse({"error": "Audio URL is not allowed"}, status=400)
-
-    upstream_request = Request(url, headers=_audio_proxy_headers(url, request))
-    try:
-        upstream = urlopen(upstream_request, timeout=30)
-    except HTTPError as e:
-        return HttpResponse(e.read()[:1000], status=e.code, content_type=e.headers.get("Content-Type", "text/plain"))
-    except URLError as e:
-        return JsonResponse({"error": f"Audio source is unavailable: {e.reason}"}, status=502)
-
-    status = getattr(upstream, "status", 200)
-    content_type = upstream.headers.get("Content-Type", "audio/mpeg")
-    response = StreamingHttpResponse(_response_chunks(upstream), status=status, content_type=content_type)
-    response["Accept-Ranges"] = upstream.headers.get("Accept-Ranges", "bytes")
-    for header in ("Content-Length", "Content-Range"):
-        value = upstream.headers.get(header)
-        if value:
-            response[header] = value
-    response["Cache-Control"] = "private, max-age=300"
-    return response
 
 
 @csrf_exempt

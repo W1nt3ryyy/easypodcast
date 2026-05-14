@@ -10,7 +10,6 @@ urlpatterns = [
     path('add/', views.add_feed, name='add_feed'),
     path('search/', views.search_podcasts, name='search_podcasts'),
     path('popular/', views.popular_podcasts, name='popular_podcasts'),
-    path('audio/', views.proxy_audio, name='proxy_audio'),
     path('preview/', views.preview_feed, name='preview_feed'),
     path('<int:feed_id>/parse/', views.parse_feed, name='parse_feed'),
     path('progress/', views.get_progress, name='get_progress'),

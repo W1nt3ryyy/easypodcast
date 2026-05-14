@@ -72,7 +72,6 @@ function AppContent() {
   const [rssModalOpen, setRssModalOpen] = useState(false);
   const [rssUrl, setRssUrl] = useState('');
   const [notice, setNotice] = useState(null);
-  const [useDirectAudio, setUseDirectAudio] = useState(false);
   const audioRef = useRef(null);
   const noticeTimerRef = useRef(null);
 
@@ -197,7 +196,6 @@ function AppContent() {
 
   useEffect(() => {
     if (!currentEpisode?.url || !audioRef.current) return;
-    setUseDirectAudio(false);
     apiFetch(`/api/podcasts/progress/?episode_url=${encodeURIComponent(currentEpisode.url)}`)
       .then(readJsonResponse)
       .then(data => {
@@ -321,10 +319,6 @@ function AppContent() {
     return entry?.audio_url || entry?.links?.find(l => l.rel === 'enclosure' || l.type?.startsWith('audio/'))?.href || '';
   }
 
-  function getPlayableAudioUrl(url) {
-    return url ? `/api/podcasts/audio/?url=${encodeURIComponent(url)}` : '';
-  }
-
   function getEpisodeImage(entry) {
     return entry?.image_url || entry?.itunes_image?.href || entry?.image?.href || selectedPodcast?.image_url || podcastDetails?.feed?.image?.href || '';
   }
@@ -345,7 +339,6 @@ function AppContent() {
       saveProgress(currentEpisode, audioRef.current.currentTime || 0, audioRef.current.duration || duration || currentEpisode.duration || 0);
     }
     const progress = historyByUrl.get(audioLink);
-    setUseDirectAudio(false);
     setDuration(entry.duration_seconds || 0);
     setPosition(progress?.current_time || 0);
     setCurrentEpisode({
@@ -360,7 +353,6 @@ function AppContent() {
   };
 
   const playHistory = (item) => {
-    setUseDirectAudio(false);
     setDuration(item.duration || 0);
     setPosition(item.current_time || 0);
     setCurrentEpisode({
@@ -768,7 +760,7 @@ function AppContent() {
             </div>
             <audio
               ref={audioRef}
-              src={useDirectAudio ? currentEpisode.url : getPlayableAudioUrl(currentEpisode.url)}
+              src={currentEpisode.url}
               autoPlay
               onLoadedMetadata={() => setDuration(audioRef.current?.duration || currentEpisode.duration || 0)}
               onTimeUpdate={() => setPosition(audioRef.current?.currentTime || 0)}
@@ -786,14 +778,6 @@ function AppContent() {
                   audioRef.current.play();
                 } else {
                   skipToNext();
-                }
-              }}
-              onError={() => {
-                if (!useDirectAudio && currentEpisode?.url) {
-                  setUseDirectAudio(true);
-                  showNotice('Серверный поток не ответил. Пробую прямое подключение к источнику.', 'Переключаю источник');
-                } else {
-                  showNotice('Источник аудио не отдал файл. Попробуйте другой эпизод или повторите позже.', t('common.error'));
                 }
               }}
             />

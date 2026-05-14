@@ -73,7 +73,6 @@ services:
       - caddy_config:/config
     depends_on:
       - frontend
-      - django-web
     profiles:
       - prod
 
