@@ -30,6 +30,8 @@ const browseGenres = [
   ['science', 'Science'],
 ];
 
+const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
 function SkeletonCard() {
   return <div className="podcast-card skeleton"><div className="skeleton-content"><div className="skeleton-title"></div><div className="skeleton-author"></div><div className="skeleton-bottom"><div className="skeleton-btn"></div><div className="skeleton-avatar"></div></div></div></div>;
 }
@@ -368,6 +370,10 @@ function AppContent() {
 
   const submitAuth = (event) => {
     event.preventDefault();
+    if (authMode === 'register' && !isValidEmail(authForm.email)) {
+      showNotice('Введите корректный email.', t('common.error'));
+      return;
+    }
     apiFetch(`/api/podcasts/auth/${authMode === 'register' ? 'register' : 'login'}/`, {
       method: 'POST',
       body: JSON.stringify(authForm),

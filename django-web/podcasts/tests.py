@@ -65,6 +65,18 @@ class PodcastAPITests(TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["error"], "invalid email")
+        self.assertFalse(get_user_model().objects.filter(username="max").exists())
+
+    def test_register_rejects_missing_email(self) -> None:
+        response = self.client.post(
+            "/api/podcasts/auth/register/",
+            data=json.dumps({"username": "max", "password": "secret123"}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["error"], "email is required")
+        self.assertFalse(get_user_model().objects.filter(username="max").exists())
 
     def test_profile_update_changes_user_and_reissues_token(self) -> None:
         User = get_user_model()
