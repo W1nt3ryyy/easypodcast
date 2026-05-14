@@ -1,4 +1,7 @@
-{$SITE_DOMAIN} {
-    encode gzip zstd
+:80 {
+    handle /api/* {
+        reverse_proxy django-web:8000
+    }
+
     reverse_proxy frontend:80
 }
