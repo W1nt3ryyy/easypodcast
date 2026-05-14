@@ -11,6 +11,8 @@ from urllib.request import Request, urlopen
 
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
@@ -38,6 +40,14 @@ ITUNES_GENRES = {
 
 def _json_body(request):
     return json.loads(request.body or b"{}")
+
+
+def _is_valid_email(email):
+    try:
+        validate_email(email)
+    except ValidationError:
+        return False
+    return True
 
 
 def _json_request(url: str, timeout: int = 12) -> dict:
@@ -360,6 +370,10 @@ def register(request):
         email = (body.get("email") or "").strip()
         if not username or not password:
             return JsonResponse({"error": "username and password are required"}, status=400)
+        if not email:
+            return JsonResponse({"error": "email is required"}, status=400)
+        if not _is_valid_email(email):
+            return JsonResponse({"error": "invalid email"}, status=400)
         User = get_user_model()
         if User.objects.filter(username=username).exists():
             return JsonResponse({"error": "username already exists"}, status=400)

@@ -23,7 +23,7 @@ OPENAPI_SCHEMA = {
                 "required": ["username", "password"],
                 "properties": {
                     "username": {"type": "string"},
-                    "email": {"type": "string"},
+                    "email": {"type": "string", "format": "email"},
                     "password": {"type": "string", "format": "password"},
                 },
             },

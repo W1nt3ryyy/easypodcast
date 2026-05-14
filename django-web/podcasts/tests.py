@@ -56,6 +56,16 @@ class PodcastRSSParserTests(TestCase):
 
 
 class PodcastAPITests(TestCase):
+    def test_register_rejects_invalid_email(self) -> None:
+        response = self.client.post(
+            "/api/podcasts/auth/register/",
+            data=json.dumps({"username": "max", "email": "invalid-email", "password": "secret123"}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["error"], "invalid email")
+
     def test_profile_update_changes_user_and_reissues_token(self) -> None:
         User = get_user_model()
         User.objects.create_user(username="max", email="old@example.com", password="secret123")

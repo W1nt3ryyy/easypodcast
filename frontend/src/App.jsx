@@ -547,7 +547,7 @@ function AppContent() {
       <p>Войдите, чтобы синхронизировать подписки и прогресс прослушивания.</p>
       <form onSubmit={submitAuth} className="stack-form">
         <input value={authForm.username} onChange={e => setAuthForm({ ...authForm, username: e.target.value })} placeholder="Логин" autoComplete="username" />
-        {authMode === 'register' && <input value={authForm.email} onChange={e => setAuthForm({ ...authForm, email: e.target.value })} placeholder="Email" autoComplete="email" />}
+        {authMode === 'register' && <input type="email" required value={authForm.email} onChange={e => setAuthForm({ ...authForm, email: e.target.value })} placeholder="Email" autoComplete="email" />}
         <input type="password" value={authForm.password} onChange={e => setAuthForm({ ...authForm, password: e.target.value })} placeholder="Пароль" autoComplete={authMode === 'register' ? 'new-password' : 'current-password'} />
         <button className="primary-btn" type="submit">{authMode === 'register' ? 'Создать аккаунт' : 'Войти'}</button>
       </form>
