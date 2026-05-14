@@ -25,6 +25,7 @@ RSS_CACHE_TTL = timedelta(hours=6)
 TOKEN_TTL_SECONDS = 60 * 60 * 24 * 7
 DEFAULT_EPISODE_PAGE_SIZE = 80
 MAX_EPISODE_PAGE_SIZE = 120
+EMAIL_PATTERN = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
 ITUNES_GENRES = {
     "all": ("", "top podcasts"),
     "business": ("1321", "business podcasts"),
@@ -43,6 +44,8 @@ def _json_body(request):
 
 
 def _is_valid_email(email):
+    if not EMAIL_PATTERN.match(email):
+        return False
     try:
         validate_email(email)
     except ValidationError:
