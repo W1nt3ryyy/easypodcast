@@ -3,7 +3,6 @@ import './index.css';
 import { I18nProvider, useI18n } from './i18n';
 
 const IconHome = () => <svg className="icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>;
-const IconAlbum = () => <svg className="icon" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20m0 14.5A4.5 4.5 0 1 1 12 7.5a4.5 4.5 0 0 1 0 9m0-5.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>;
 const IconRSS = () => <svg className="icon" viewBox="0 0 24 24"><path d="M6.18 15.64a2.18 2.18 0 1 1 0 4.36 2.18 2.18 0 0 1 0-4.36M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>;
 const IconPlay = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>;
 const IconPause = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>;
@@ -12,15 +11,14 @@ const IconSun = () => <svg className="icon" viewBox="0 0 24 24"><path d="M12 7a5
 const IconMoon = () => <svg className="icon" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.4 5.4 0 0 1-9.8-3.14c0-1.81.89-3.42 2.26-4.4A9 9 0 0 0 12 3z"/></svg>;
 const IconSearch = () => <svg className="icon" viewBox="0 0 24 24"><path d="M9.5 3a6.5 6.5 0 0 1 5.16 10.45l4.45 4.44-1.42 1.42-4.44-4.45A6.5 6.5 0 1 1 9.5 3m0 2a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9z"/></svg>;
 const IconUser = () => <svg className="icon" viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10m0 2c-3.33 0-10 1.67-10 5v3h20v-3c0-3.33-6.67-5-10-5z"/></svg>;
-const IconStar = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12 17.27 6.18 3.73-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>;
 const IconCheck = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m9 16.17-3.88-3.88L3.7 13.7 9 19 21 7l-1.41-1.41z"/></svg>;
 const IconShuffle = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M10.59 9.17 5.41 4 4 5.41l5.17 5.18 1.42-1.42M14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5m.33 9.41-1.42 1.42 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>;
 const IconPrev = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 6h2v12H7V6m4 6 7-5v10l-7-5z"/></svg>;
 const IconNext = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M15 6h2v12h-2V6M6 7l7 5-7 5V7z"/></svg>;
 const IconRepeat = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h11v3l4-4-4-4v3H5v6h2V7m10 10H6v-3l-4 4 4 4v-3h13v-6h-2v4z"/></svg>;
 const IconVolume = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3m13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.47 4.47 0 0 0 16.5 12M14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg>;
+const IconClose = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>;
 
-const emptyLibrary = { bookmarks: [], subscriptions: [], folders: [] };
 const browseGenres = [
   ['all', 'Все'],
   ['technology', 'Technology'],
@@ -63,10 +61,7 @@ function AppContent() {
   const [authMode, setAuthMode] = useState('login');
   const [authForm, setAuthForm] = useState({ username: '', email: '', password: '' });
   const [profileForm, setProfileForm] = useState({ username: '', email: '', password: '' });
-  const [library, setLibrary] = useState(emptyLibrary);
   const [history, setHistory] = useState([]);
-  const [folderName, setFolderName] = useState('');
-  const [folderTarget, setFolderTarget] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -76,7 +71,9 @@ function AppContent() {
   const [browseLoading, setBrowseLoading] = useState(false);
   const [rssModalOpen, setRssModalOpen] = useState(false);
   const [rssUrl, setRssUrl] = useState('');
+  const [notice, setNotice] = useState(null);
   const audioRef = useRef(null);
+  const noticeTimerRef = useRef(null);
 
   const classes = ['c-pink', 'c-blue', 'c-purple', 'c-green'];
   const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
@@ -103,6 +100,12 @@ function AppContent() {
     return data;
   };
 
+  const showNotice = (message, title = 'Готово') => {
+    setNotice({ title, message });
+    window.clearTimeout(noticeTimerRef.current);
+    noticeTimerRef.current = window.setTimeout(() => setNotice(null), 2800);
+  };
+
   const loadPodcasts = () => {
     setLoading(true);
     apiFetch('/api/podcasts/')
@@ -110,17 +113,6 @@ function AppContent() {
       .then(data => data.status === 'ok' && setPodcasts(data.items))
       .catch(e => console.error('Error fetching podcasts:', e))
       .finally(() => setLoading(false));
-  };
-
-  const loadLibrary = () => {
-    if (!token) {
-      setLibrary(emptyLibrary);
-      return;
-    }
-    apiFetch('/api/podcasts/library/')
-      .then(readJsonResponse)
-      .then(data => data.status === 'ok' && setLibrary(data))
-      .catch(() => setLibrary(emptyLibrary));
   };
 
   const loadHistory = () => {
@@ -134,18 +126,18 @@ function AppContent() {
       .catch(() => setHistory([]));
   };
 
-  function saveProgress() {
-    if (!audioRef.current || !currentEpisode) return;
+  function saveProgress(episode = currentEpisode, currentTime = audioRef.current?.currentTime || 0, totalDuration = audioRef.current?.duration || duration || episode?.duration || 0) {
+    if (!episode?.url) return Promise.resolve();
     apiFetch('/api/podcasts/progress/save/', {
       method: 'POST',
       body: JSON.stringify({
-        episode_url: currentEpisode.url,
-        current_time: audioRef.current.currentTime,
-        duration: audioRef.current.duration || duration || currentEpisode.duration || 0,
-        episode_title: currentEpisode.title,
-        podcast_title: currentEpisode.podcastTitle,
-        podcast_url: currentEpisode.podcastUrl,
-        image_url: currentEpisode.cover,
+        episode_url: episode.url,
+        current_time: currentTime,
+        duration: totalDuration,
+        episode_title: episode.title,
+        podcast_title: episode.podcastTitle,
+        podcast_url: episode.podcastUrl,
+        image_url: episode.cover,
       }),
     }).then(() => loadHistory()).catch(() => {});
   }
@@ -171,7 +163,8 @@ function AppContent() {
     localStorage.removeItem('jwt');
     setToken('');
     setUser(null);
-    setLibrary(emptyLibrary);
+    setPodcasts([]);
+    setSelectedPodcast(null);
     setHistory([]);
     setProfileForm({ username: '', email: '', password: '' });
   };
@@ -194,7 +187,6 @@ function AppContent() {
   }, [token]);
 
   useEffect(() => {
-    loadLibrary();
     loadHistory();
   }, [token]);
 
@@ -223,13 +215,6 @@ function AppContent() {
     if (audioRef.current) audioRef.current.volume = volume;
   }, [volume]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (audioRef.current && !audioRef.current.paused && currentEpisode) saveProgress();
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [currentEpisode, token, duration]);
-
   const categories = useMemo(() => ['all', ...Array.from(new Set(podcasts.map(p => p.category).filter(Boolean)))], [podcasts]);
   const visiblePodcasts = selectedCategory === 'all' ? podcasts : podcasts.filter(p => p.category === selectedCategory);
 
@@ -249,6 +234,11 @@ function AppContent() {
   };
 
   const handleAddFeed = (prefilled = '', category = '') => {
+    if (!token) {
+      showNotice('Войдите в аккаунт, чтобы добавить подкаст в подписки.', 'Нужен вход');
+      setActiveTab('profile');
+      return Promise.resolve();
+    }
     const metadata = typeof prefilled === 'object' && prefilled ? prefilled : { url: prefilled, category };
     if (!metadata.url) {
       setRssModalOpen(true);
@@ -263,11 +253,11 @@ function AppContent() {
         if (data.status !== 'ok') throw new Error(data.error || 'Не удалось добавить подкаст');
         loadPodcasts();
         if (selectedPodcast?.is_preview && selectedPodcast.url === url) {
-          setSelectedPodcast({ ...data.item, is_preview: false });
+          setSelectedPodcast({ ...data.item, is_preview: false, is_subscribed: true });
         }
-        alert(t('common.podcastAdded'));
+        showNotice('Подкаст добавлен в обзор.', 'Подкаст добавлен');
       })
-      .catch(e => alert(`${t('common.error')}: ${e.message}`))
+      .catch(e => showNotice(e.message, t('common.error')))
       .finally(() => setLoading(false));
   };
 
@@ -306,7 +296,7 @@ function AppContent() {
           setPodcastDetails(previous => append ? mergePodcastDetails(previous, data.data) : data.data);
         }
       })
-      .catch(e => alert(e.message))
+      .catch(e => showNotice(e.message, t('common.error')))
       .finally(() => {
         setDetailsLoading(false);
         setEpisodesLoadingMore(false);
@@ -316,7 +306,6 @@ function AppContent() {
   const openPodcast = (podcast) => {
     setSelectedPodcast(podcast);
     setPodcastDetails(null);
-    setFolderTarget('');
     loadPodcastPage(podcast, 0, false);
   };
 
@@ -339,12 +328,15 @@ function AppContent() {
   const playEpisode = (entry) => {
     const audioLink = getAudioUrl(entry);
     if (!audioLink) {
-      alert(t('common.noAudio'));
+      showNotice(t('common.noAudio'), t('common.error'));
       return;
     }
     if (audioLink === currentEpisode?.url) {
       togglePlay();
       return;
+    }
+    if (currentEpisode && audioRef.current) {
+      saveProgress(currentEpisode, audioRef.current.currentTime || 0, audioRef.current.duration || duration || currentEpisode.duration || 0);
     }
     const progress = historyByUrl.get(audioLink);
     setDuration(entry.duration_seconds || 0);
@@ -387,9 +379,9 @@ function AppContent() {
         setToken(data.token);
         setUser(data.user);
         setProfileForm({ username: data.user.username || '', email: data.user.email || '', password: '' });
-        setActiveTab('library');
+        setActiveTab('overview');
       })
-      .catch(e => alert(e.message));
+      .catch(e => showNotice(e.message, t('common.error')));
   };
 
   const submitProfile = (event) => {
@@ -402,32 +394,14 @@ function AppContent() {
         setToken(data.token);
         setUser(data.user);
         setProfileForm({ username: data.user.username || '', email: data.user.email || '', password: '' });
-        alert('Профиль сохранен');
+        showNotice('Профиль сохранен.');
       })
-      .catch(e => alert(e.message));
-  };
-
-  const toggleBookmark = (feed) => {
-    if (!token) {
-      setActiveTab('profile');
-      return;
-    }
-    if (feed.is_preview) {
-      handleAddFeed(feed);
-      return;
-    }
-    apiFetch('/api/podcasts/bookmarks/toggle/', { method: 'POST', body: JSON.stringify({ feed_id: feed.id }) })
-      .then(readJsonResponse)
-      .then(data => {
-        if (data.status === 'ok') {
-          updatePodcastFlag(feed.id, 'is_bookmarked', data.active);
-          loadLibrary();
-        }
-      });
+      .catch(e => showNotice(e.message, t('common.error')));
   };
 
   const toggleSubscription = (feed) => {
     if (!token) {
+      showNotice('Войдите в аккаунт, чтобы управлять подписками.', 'Нужен вход');
       setActiveTab('profile');
       return;
     }
@@ -440,32 +414,8 @@ function AppContent() {
       .then(data => {
         if (data.status === 'ok') {
           updatePodcastFlag(feed.id, 'is_subscribed', data.active);
-          loadLibrary();
-        }
-      });
-  };
-
-  const createFolder = (event) => {
-    event.preventDefault();
-    if (!folderName.trim()) return;
-    apiFetch('/api/podcasts/folders/', { method: 'POST', body: JSON.stringify({ name: folderName }) })
-      .then(readJsonResponse)
-      .then(data => {
-        if (data.status === 'ok') {
-          setLibrary(data);
-          setFolderName('');
-        }
-      });
-  };
-
-  const addSelectedToFolder = () => {
-    if (!selectedPodcast || !folderTarget || selectedPodcast.is_preview) return;
-    apiFetch(`/api/podcasts/folders/${folderTarget}/add/`, { method: 'POST', body: JSON.stringify({ feed_id: selectedPodcast.id }) })
-      .then(readJsonResponse)
-      .then(data => {
-        if (data.status === 'ok') {
-          setLibrary(data);
-          setFolderTarget('');
+          loadPodcasts();
+          showNotice(data.active ? 'Подкаст добавлен в обзор.' : 'Подкаст убран из обзора.', data.active ? 'Подписка включена' : 'Подписка отключена');
         }
       });
   };
@@ -479,7 +429,7 @@ function AppContent() {
       .then(data => {
         if (data.status === 'ok') setSearchResults(data.items);
       })
-      .catch(e => alert(e.message))
+      .catch(e => showNotice(e.message, t('common.error')))
       .finally(() => setSearchLoading(false));
   };
 
@@ -552,7 +502,6 @@ function AppContent() {
       <div className="card-bg" style={podcast.image_url ? { backgroundImage: `url(${podcast.image_url})` } : undefined}></div>
       <div className="card-content">
         <div className="card-actions" onClick={event => event.stopPropagation()}>
-          <button className={`mini-action ${podcast.is_bookmarked ? 'active' : ''}`} title="В закладки" onClick={() => toggleBookmark(podcast)}><IconStar /></button>
           <button className={`mini-action ${podcast.is_subscribed ? 'active' : ''}`} title="Подписаться" onClick={() => toggleSubscription(podcast)}><IconCheck /></button>
         </div>
         <div className="card-bottom">
@@ -595,7 +544,7 @@ function AppContent() {
   const renderAuth = () => (
     <div className="panel-card auth-panel">
       <h2>{authMode === 'register' ? 'Регистрация' : 'Вход'}</h2>
-      <p>Войдите, чтобы синхронизировать подписки, закладки и прогресс прослушивания.</p>
+      <p>Войдите, чтобы синхронизировать подписки и прогресс прослушивания.</p>
       <form onSubmit={submitAuth} className="stack-form">
         <input value={authForm.username} onChange={e => setAuthForm({ ...authForm, username: e.target.value })} placeholder="Логин" autoComplete="username" />
         {authMode === 'register' && <input value={authForm.email} onChange={e => setAuthForm({ ...authForm, email: e.target.value })} placeholder="Email" autoComplete="email" />}
@@ -607,34 +556,6 @@ function AppContent() {
       </button>
     </div>
   );
-
-  const renderLibrary = () => {
-    if (!token) return renderAuth();
-    return (
-      <div className="library-view">
-        <div className="panel-card library-header">
-          <div>
-            <h2>Моя библиотека</h2>
-            <p>Подписки, закладки и папки сохраняются для {user?.username}.</p>
-          </div>
-          <form onSubmit={createFolder} className="folder-form">
-            <input value={folderName} onChange={e => setFolderName(e.target.value)} placeholder="Новая папка" />
-            <button className="primary-btn" type="submit">Создать</button>
-          </form>
-        </div>
-        <h3 className="section-title">Подписки</h3>
-        {renderCards(library.subscriptions || [])}
-        <h3 className="section-title">Закладки</h3>
-        {renderCards(library.bookmarks || [])}
-        {(library.folders || []).map(folder => (
-          <React.Fragment key={folder.id}>
-            <h3 className="section-title">Папка: {folder.name}</h3>
-            {renderCards(folder.items || [])}
-          </React.Fragment>
-        ))}
-      </div>
-    );
-  };
 
   const renderSearch = () => (
     <div className="search-view">
@@ -684,9 +605,8 @@ function AppContent() {
         <div className="panel-card profile-card">
           <h2>Активность</h2>
           <div className="profile-stats">
-            <span><b>{library.subscriptions?.length || 0}</b> подписок</span>
-            <span><b>{library.bookmarks?.length || 0}</b> закладок</span>
-            <span><b>{library.folders?.length || 0}</b> папок</span>
+            <span><b>{podcasts.length}</b> подписок</span>
+            <span><b>{history.filter(item => item.completed).length}</b> прослушано</span>
           </div>
           <button className="link-btn danger-link" onClick={logout}>Выйти</button>
         </div>
@@ -729,7 +649,6 @@ function AppContent() {
         </div>
         <ul className="nav-menu">
           <li className={`nav-item ${activeTab === 'overview' && !selectedPodcast ? 'active' : ''}`} onClick={() => { setActiveTab('overview'); setSelectedPodcast(null); }}><IconHome /> {t('nav.overview')}</li>
-          <li className={`nav-item ${activeTab === 'library' ? 'active' : ''}`} onClick={() => { setActiveTab('library'); setSelectedPodcast(null); loadLibrary(); }}><IconAlbum /> {t('nav.subscriptions')}</li>
           <li className={`nav-item ${activeTab === 'search' ? 'active' : ''}`} onClick={() => { setActiveTab('search'); setSelectedPodcast(null); }}><IconSearch /> Каталог</li>
         </ul>
         <div className="nav-divider"></div>
@@ -743,9 +662,9 @@ function AppContent() {
         <header className="header">
           <div>
             <div className="header-title">
-              {selectedPodcast ? detailTitle : activeTab === 'library' ? 'Библиотека' : activeTab === 'search' ? 'Каталог' : activeTab === 'profile' ? 'Профиль' : t('nav.overview')}
+              {selectedPodcast ? detailTitle : activeTab === 'search' ? 'Каталог' : activeTab === 'profile' ? 'Профиль' : t('nav.overview')}
             </div>
-            {!selectedPodcast && <p className="header-subtitle">Слушайте, сохраняйте и открывайте новые подкасты без лишней суеты.</p>}
+            {!selectedPodcast && <p className="header-subtitle">Слушайте, сохраняйте и открывайте новые подкасты.</p>}
           </div>
           <div className="user-profile">
             <button className="theme-toggle" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} title="Сменить тему">
@@ -753,7 +672,6 @@ function AppContent() {
             </button>
             <div className="user-info">
               <span className="user-name">{user?.username || t('player.guest')}</span>
-              <span className="user-loc">{user ? 'Синхронизация включена' : 'Локальный режим'}</span>
             </div>
             {user && <button className="link-btn" onClick={logout}>Выйти</button>}
             <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.username || t('player.guest'))}&background=ef1e5d&color=fff`} alt="" className="user-avatar" />
@@ -782,17 +700,7 @@ function AppContent() {
                       ) : (
                         <>
                           <button className={`chip-btn ${selectedPodcast.is_subscribed ? 'active' : ''}`} onClick={() => toggleSubscription(selectedPodcast)}>{selectedPodcast.is_subscribed ? 'В подписках' : 'Подписаться'}</button>
-                          <button className={`chip-btn ${selectedPodcast.is_bookmarked ? 'active' : ''}`} onClick={() => toggleBookmark(selectedPodcast)}>{selectedPodcast.is_bookmarked ? 'В закладках' : 'Закладка'}</button>
                         </>
-                      )}
-                      {token && !selectedPodcast.is_preview && library.folders?.length > 0 && (
-                        <div className="folder-add">
-                          <select value={folderTarget} onChange={e => setFolderTarget(e.target.value)}>
-                            <option value="">Выбрать папку</option>
-                            {library.folders.map(folder => <option value={folder.id} key={folder.id}>{folder.name}</option>)}
-                          </select>
-                          <button className="chip-btn" onClick={addSelectedToFolder}>Добавить</button>
-                        </div>
                       )}
                     </div>
                     <div className="pd-desc-card" dangerouslySetInnerHTML={{ __html: selectedPodcast.description || podcastDetails?.feed?.description || podcastDetails?.feed?.summary || 'Описание недоступно' }}></div>
@@ -825,7 +733,7 @@ function AppContent() {
             </div>
             {loading ? <div className="cards-grid"><SkeletonCard /><SkeletonCard /><SkeletonCard /><SkeletonCard /></div> : renderCards(visiblePodcasts)}
           </>
-        ) : activeTab === 'library' ? renderLibrary() : activeTab === 'search' ? renderSearch() : renderProfile()}
+        ) : activeTab === 'search' ? renderSearch() : renderProfile()}
       </main>
 
       {currentEpisode && (
@@ -857,7 +765,11 @@ function AppContent() {
               onLoadedMetadata={() => setDuration(audioRef.current?.duration || currentEpisode.duration || 0)}
               onTimeUpdate={() => setPosition(audioRef.current?.currentTime || 0)}
               onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
+              onPause={() => {
+                setIsPlaying(false);
+                if (audioRef.current?.ended) return;
+                saveProgress();
+              }}
               onEnded={() => {
                 setIsPlaying(false);
                 saveProgress();
@@ -874,7 +786,17 @@ function AppContent() {
             <IconVolume />
             <input type="range" min="0" max="1" step="0.05" value={volume} onChange={e => setVolume(Number(e.target.value))} />
           </div>
-          <button className="close-player" onClick={() => { saveProgress(); setCurrentEpisode(null); }} title="Закрыть">x</button>
+          <button className="close-player" onClick={() => { saveProgress(); setCurrentEpisode(null); setIsPlaying(false); }} title="Закрыть" aria-label="Закрыть плеер"><IconClose /></button>
+        </div>
+      )}
+
+      {notice && (
+        <div className="notice-backdrop" onClick={() => setNotice(null)}>
+          <div className="notice-card" onClick={event => event.stopPropagation()} role="status" aria-live="polite">
+            <h2>{notice.title}</h2>
+            <p>{notice.message}</p>
+            <button className="primary-btn" type="button" onClick={() => setNotice(null)}>OK</button>
+          </div>
         </div>
       )}
 

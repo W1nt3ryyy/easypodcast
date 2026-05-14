@@ -15,20 +15,6 @@ class PodcastFeed(models.Model):
         return self.title or self.url
 
 
-class Bookmark(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="podcast_bookmarks", null=True, blank=True)
-    feed = models.ForeignKey(PodcastFeed, on_delete=models.CASCADE, related_name="bookmarks")
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=["user", "feed"], name="unique_user_bookmark")
-        ]
-
-    def __str__(self):
-        return f"Bookmark: {self.feed.title}"
-
-
 class Subscription(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="podcast_subscriptions")
     feed = models.ForeignKey(PodcastFeed, on_delete=models.CASCADE, related_name="subscriptions")
@@ -41,32 +27,6 @@ class Subscription(models.Model):
 
     def __str__(self):
         return f"Subscription: {self.feed.title}"
-
-
-class PodcastFolder(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="podcast_folders")
-    name = models.CharField(max_length=120)
-    feeds = models.ManyToManyField(PodcastFeed, through="PodcastFolderItem", related_name="folders")
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=["user", "name"], name="unique_user_folder")
-        ]
-
-    def __str__(self):
-        return self.name
-
-
-class PodcastFolderItem(models.Model):
-    folder = models.ForeignKey(PodcastFolder, on_delete=models.CASCADE, related_name="items")
-    feed = models.ForeignKey(PodcastFeed, on_delete=models.CASCADE, related_name="folder_items")
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=["folder", "feed"], name="unique_folder_feed")
-        ]
 
 
 class ListenProgress(models.Model):

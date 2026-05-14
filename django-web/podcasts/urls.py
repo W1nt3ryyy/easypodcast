@@ -15,9 +15,5 @@ urlpatterns = [
     path('progress/', views.get_progress, name='get_progress'),
     path('progress/save/', views.save_progress, name='save_progress'),
     path('history/', views.history, name='history'),
-    path('library/', views.library, name='library'),
-    path('bookmarks/toggle/', views.toggle_bookmark, name='toggle_bookmark'),
     path('subscriptions/toggle/', views.toggle_subscription, name='toggle_subscription'),
-    path('folders/', views.folders, name='folders'),
-    path('folders/<int:folder_id>/add/', views.add_to_folder, name='add_to_folder'),
 ]

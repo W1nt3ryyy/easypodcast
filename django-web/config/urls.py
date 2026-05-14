@@ -16,8 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from . import api_docs
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/schema/', api_docs.schema, name='api_schema'),
+    path('api/docs/', api_docs.swagger_ui, name='swagger_ui'),
     path('api/podcasts/', include('podcasts.urls')),
 ]

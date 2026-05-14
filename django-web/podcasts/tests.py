@@ -10,7 +10,7 @@ from django.test import TestCase
 from feedparser.util import FeedParserDict
 
 from podcasts.services import PodcastFeedConnectionError, parse_podcast_rss
-from podcasts.models import PodcastFeed
+from podcasts.models import PodcastFeed, Subscription
 
 
 class PodcastRSSParserTests(TestCase):
@@ -113,6 +113,15 @@ class PodcastAPITests(TestCase):
         self.assertEqual(response.json()["items"][0]["url"], "https://example.com/feed.xml")
 
     def test_add_feed_from_directory_metadata_does_not_require_immediate_rss_fetch(self) -> None:
+        User = get_user_model()
+        User.objects.create_user(username="max", password="secret123")
+        login_response = self.client.post(
+            "/api/podcasts/auth/login/",
+            data=json.dumps({"username": "max", "password": "secret123"}),
+            content_type="application/json",
+        )
+        token = login_response.json()["token"]
+
         response = self.client.post(
             "/api/podcasts/add/",
             data=json.dumps(
@@ -124,8 +133,60 @@ class PodcastAPITests(TestCase):
                 }
             ),
             content_type="application/json",
+            headers={"Authorization": f"Bearer {token}"},
         )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["item"]["title"], "Slow Directory Podcast")
+        self.assertTrue(response.json()["item"]["is_subscribed"])
         self.assertTrue(PodcastFeed.objects.filter(url="https://slow.example.com/feed.xml").exists())
+        self.assertEqual(Subscription.objects.count(), 1)
+
+    def test_subscriptions_are_isolated_between_users(self) -> None:
+        User = get_user_model()
+        first = User.objects.create_user(username="first", password="secret123")
+        User.objects.create_user(username="second", password="secret123")
+        feed = PodcastFeed.objects.create(url="https://example.com/rss.xml", title="Personal Show")
+        Subscription.objects.create(user=first, feed=feed)
+
+        first_token = self.client.post(
+            "/api/podcasts/auth/login/",
+            data=json.dumps({"username": "first", "password": "secret123"}),
+            content_type="application/json",
+        ).json()["token"]
+        second_token = self.client.post(
+            "/api/podcasts/auth/login/",
+            data=json.dumps({"username": "second", "password": "secret123"}),
+            content_type="application/json",
+        ).json()["token"]
+
+        first_response = self.client.get("/api/podcasts/", headers={"Authorization": f"Bearer {first_token}"})
+        second_response = self.client.get("/api/podcasts/", headers={"Authorization": f"Bearer {second_token}"})
+
+        self.assertEqual(len(first_response.json()["items"]), 1)
+        self.assertEqual(second_response.json()["items"], [])
+
+    def test_feedpress_results_are_exposed_for_server_side_fetching(self) -> None:
+        class MockResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_args):
+                return False
+
+            def read(self):
+                return json.dumps(
+                    {
+                        "results": [
+                            {"collectionName": "Blocked", "feedUrl": "https://feedpress.me/blocked", "collectionId": 1},
+                            {"collectionName": "Available", "feedUrl": "https://example.com/rss.xml", "collectionId": 2},
+                        ]
+                    }
+                ).encode("utf-8")
+
+        with patch("podcasts.views.urlopen", return_value=MockResponse()):
+            response = self.client.get("/api/podcasts/search/?q=podcast")
+
+        urls = [item["url"] for item in response.json()["items"]]
+        self.assertIn("https://feedpress.me/blocked", urls)
+        self.assertIn("https://example.com/rss.xml", urls)

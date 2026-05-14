@@ -26,7 +26,7 @@ services:
     container_name: django-docker
     volumes:
       - ./django-web:/app
-    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    command: sh -c "python manage.py migrate && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 90"
     ports:
       - "8001:8000"
     depends_on:
@@ -51,11 +51,29 @@ services:
   frontend:
     build: ./frontend/
     container_name: react-frontend
-    ports:
-      - "80:80"
+    expose:
+      - "80"
     depends_on:
       - django-web
     restart: always
+    profiles:
+      - prod
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: easypodcasts-caddy
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
     profiles:
       - prod
 
@@ -102,3 +120,5 @@ services:
 
 volumes:
   postgres_data:
+  caddy_data:
+  caddy_config:

@@ -16,14 +16,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
-from .models import (
-    Bookmark,
-    ListenProgress,
-    PodcastFeed,
-    PodcastFolder,
-    PodcastFolderItem,
-    Subscription,
-)
+from .models import ListenProgress, PodcastFeed, Subscription
 from .services import PodcastFeedConnectionError, parse_podcast_rss
 
 RSS_CACHE_TTL = timedelta(hours=6)
@@ -218,7 +211,6 @@ def _serialize_feed(feed: PodcastFeed, user=None) -> dict:
         "category": feed.category,
     }
     if user and user.is_authenticated:
-        data["is_bookmarked"] = Bookmark.objects.filter(user=user, feed=feed).exists()
         data["is_subscribed"] = Subscription.objects.filter(user=user, feed=feed).exists()
     return data
 
@@ -306,7 +298,7 @@ def _resolve_podcast_url(url: str) -> str:
     for item in payload.get("results", []):
         if item.get("feedUrl"):
             return item["feedUrl"]
-    return url
+    raise PodcastFeedConnectionError("Не нашли доступную RSS-ленту для этого подкаста.")
 
 
 def _directory_item(item: dict) -> dict | None:
@@ -348,6 +340,10 @@ def _itunes_search(term: str, genre_id: str = "", limit: int = 24) -> list[dict]
 def get_feeds(request):
     user = _get_request_user(request)
     feeds = PodcastFeed.objects.all().only("id", "url", "title", "description", "image_url", "category").order_by("title", "id")
+    if user and user.is_authenticated:
+        feeds = feeds.filter(subscriptions__user=user).distinct()
+    else:
+        feeds = feeds.none()
     category = request.GET.get("category")
     if category:
         feeds = feeds.filter(category__iexact=category)
@@ -419,6 +415,9 @@ def update_profile(request):
 @require_http_methods(["POST"])
 def add_feed(request):
     try:
+        user = _get_request_user(request)
+        if not user:
+            return JsonResponse({"error": "Authentication required"}, status=401)
         body = _json_body(request)
         url = _resolve_podcast_url((body.get("url") or "").strip())
         if not url:
@@ -426,7 +425,8 @@ def add_feed(request):
         feed, created = PodcastFeed.objects.get_or_create(url=url)
         if body.get("title") or body.get("image_url"):
             _apply_directory_metadata(feed, body)
-            return JsonResponse({"status": "ok", "created": created, "item": _serialize_feed(feed, _get_request_user(request))})
+            Subscription.objects.get_or_create(user=user, feed=feed)
+            return JsonResponse({"status": "ok", "created": created, "item": _serialize_feed(feed, user)})
         try:
             parsed = parse_podcast_rss(url)
             _apply_feed_metadata(feed, parsed, body.get("category") or "")
@@ -434,7 +434,8 @@ def add_feed(request):
             _apply_directory_metadata(feed, body)
             if not feed.title:
                 raise
-        return JsonResponse({"status": "ok", "created": created, "item": _serialize_feed(feed, _get_request_user(request))})
+        Subscription.objects.get_or_create(user=user, feed=feed)
+        return JsonResponse({"status": "ok", "created": created, "item": _serialize_feed(feed, user)})
     except PodcastFeedConnectionError as e:
         return JsonResponse({"error": str(e)}, status=400)
     except Exception as e:
@@ -576,44 +577,6 @@ def history(request):
     return JsonResponse({"status": "ok", "items": [_progress_payload(item) for item in items]})
 
 
-def _library_payload(user):
-    folders = []
-    for folder in PodcastFolder.objects.filter(user=user).order_by("name"):
-        folders.append(
-            {
-                "id": folder.id,
-                "name": folder.name,
-                "items": [_serialize_feed(item.feed, user) for item in folder.items.select_related("feed").order_by("feed__title")],
-            }
-        )
-    return {
-        "status": "ok",
-        "bookmarks": [_serialize_feed(bookmark.feed, user) for bookmark in Bookmark.objects.filter(user=user).select_related("feed")],
-        "subscriptions": [_serialize_feed(subscription.feed, user) for subscription in Subscription.objects.filter(user=user).select_related("feed")],
-        "folders": folders,
-    }
-
-
-@_require_auth
-def library(request):
-    return JsonResponse(_library_payload(request.jwt_user))
-
-
-@csrf_exempt
-@require_http_methods(["POST"])
-@_require_auth
-def toggle_bookmark(request):
-    feed = PodcastFeed.objects.get(id=_json_body(request).get("feed_id"))
-    existing = Bookmark.objects.filter(user=request.jwt_user, feed=feed).first()
-    if existing:
-        existing.delete()
-        active = False
-    else:
-        Bookmark.objects.create(user=request.jwt_user, feed=feed)
-        active = True
-    return JsonResponse({"status": "ok", "active": active})
-
-
 @csrf_exempt
 @require_http_methods(["POST"])
 @_require_auth
@@ -627,25 +590,3 @@ def toggle_subscription(request):
         Subscription.objects.create(user=request.jwt_user, feed=feed)
         active = True
     return JsonResponse({"status": "ok", "active": active})
-
-
-@csrf_exempt
-@require_http_methods(["GET", "POST"])
-@_require_auth
-def folders(request):
-    if request.method == "POST":
-        name = (_json_body(request).get("name") or "").strip()
-        if not name:
-            return JsonResponse({"error": "name is required"}, status=400)
-        PodcastFolder.objects.get_or_create(user=request.jwt_user, name=name)
-    return JsonResponse(_library_payload(request.jwt_user))
-
-
-@csrf_exempt
-@require_http_methods(["POST"])
-@_require_auth
-def add_to_folder(request, folder_id):
-    folder = PodcastFolder.objects.get(id=folder_id, user=request.jwt_user)
-    feed = PodcastFeed.objects.get(id=_json_body(request).get("feed_id"))
-    PodcastFolderItem.objects.get_or_create(folder=folder, feed=feed)
-    return JsonResponse(_library_payload(request.jwt_user))
