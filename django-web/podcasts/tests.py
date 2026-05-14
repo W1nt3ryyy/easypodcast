@@ -190,3 +190,47 @@ class PodcastAPITests(TestCase):
         urls = [item["url"] for item in response.json()["items"]]
         self.assertIn("https://feedpress.me/blocked", urls)
         self.assertIn("https://example.com/rss.xml", urls)
+
+    def test_audio_proxy_forwards_range_request(self) -> None:
+        class MockAudioResponse:
+            status = 206
+
+            def __init__(self):
+                self.headers = {
+                    "Content-Type": "audio/mpeg",
+                    "Content-Length": "4",
+                    "Content-Range": "bytes 0-3/10",
+                    "Accept-Ranges": "bytes",
+                }
+                self.sent = False
+
+            def read(self, _size=-1):
+                if self.sent:
+                    return b""
+                self.sent = True
+                return b"test"
+
+            def close(self):
+                pass
+
+        captured_headers = {}
+
+        def fake_urlopen(request, timeout=30):
+            captured_headers.update(dict(request.header_items()))
+            return MockAudioResponse()
+
+        with patch("podcasts.views._is_public_http_url", return_value=True), patch("podcasts.views.urlopen", side_effect=fake_urlopen):
+            response = self.client.get(
+                "/api/podcasts/audio/?url=https%3A%2F%2Fanchor.fm%2Fs%2Fshow%2Fepisode.mp3",
+                headers={"Range": "bytes=0-3"},
+            )
+
+        self.assertEqual(response.status_code, 206)
+        self.assertEqual(b"".join(response.streaming_content), b"test")
+        self.assertEqual(response["Content-Range"], "bytes 0-3/10")
+        self.assertEqual(captured_headers["Range"], "bytes=0-3")
+
+    def test_audio_proxy_rejects_private_urls(self) -> None:
+        response = self.client.get("/api/podcasts/audio/?url=http%3A%2F%2F127.0.0.1%2Fsecret.mp3")
+
+        self.assertEqual(response.status_code, 400)

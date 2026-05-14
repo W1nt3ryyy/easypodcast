@@ -319,6 +319,10 @@ function AppContent() {
     return entry?.audio_url || entry?.links?.find(l => l.rel === 'enclosure' || l.type?.startsWith('audio/'))?.href || '';
   }
 
+  function getPlayableAudioUrl(url) {
+    return url ? `/api/podcasts/audio/?url=${encodeURIComponent(url)}` : '';
+  }
+
   function getEpisodeImage(entry) {
     return entry?.image_url || entry?.itunes_image?.href || entry?.image?.href || selectedPodcast?.image_url || podcastDetails?.feed?.image?.href || '';
   }
@@ -760,7 +764,7 @@ function AppContent() {
             </div>
             <audio
               ref={audioRef}
-              src={currentEpisode.url}
+              src={getPlayableAudioUrl(currentEpisode.url)}
               autoPlay
               onLoadedMetadata={() => setDuration(audioRef.current?.duration || currentEpisode.duration || 0)}
               onTimeUpdate={() => setPosition(audioRef.current?.currentTime || 0)}
